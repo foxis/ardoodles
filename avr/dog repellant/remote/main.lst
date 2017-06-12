@@ -1,0 +1,546 @@
+   1               		.file	"main.c"
+   2               		.arch attiny26
+   3               	__SREG__ = 0x3f
+   4               	__SP_H__ = 0x3e
+   5               	__SP_L__ = 0x3d
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.global __do_copy_data
+   9               		.global __do_clear_bss
+  10               		.text
+  11               	.global	set_led
+  13               	set_led:
+  14               	/* prologue: frame size=0 */
+  15               	/* prologue end (size=0) */
+  16 0000 8823      		tst r24
+  17 0002 11F0      		breq .L2
+  18 0004 DB9A      		sbi 59-0x20,3
+  19 0006 0895      		ret
+  20               	.L2:
+  21 0008 DB98      		cbi 59-0x20,3
+  22 000a 0895      		ret
+  23               	/* epilogue: frame size=0 */
+  24               	/* epilogue: noreturn */
+  25               	/* epilogue end (size=0) */
+  26               	/* function set_led size 6 (6) */
+  28               	.global	delay_us
+  30               	delay_us:
+  31               	/* prologue: frame size=0 */
+  32               	/* prologue end (size=0) */
+  33 000c 282F      		mov r18,r24
+  34 000e 392F      		mov r19,r25
+  35 0010 92E0      		ldi r25,lo8(2)
+  36 0012 03C0      		rjmp .L7
+  37               	.L8:
+  38 0014 892F      		mov r24,r25
+  39               	/* #APP */
+  40 0016 8A95      		1: dec r24
+  41 0018 F1F7      		brne 1b
+  42               	/* #NOAPP */
+  43               	.L7:
+  44 001a 2150      		subi r18,lo8(-(-1))
+  45 001c 3040      		sbci r19,hi8(-(-1))
+  46 001e 8FEF      		ldi r24,hi8(-1)
+  47 0020 2F3F      		cpi r18,lo8(-1)
+  48 0022 3807      		cpc r19,r24
+  49 0024 B9F7      		brne .L8
+  50               	/* epilogue: frame size=0 */
+  51 0026 0895      		ret
+  52               	/* epilogue end (size=1) */
+  53               	/* function delay_us size 16 (15) */
+  55               	.global	check_keys
+  57               	check_keys:
+  58               	/* prologue: frame size=0 */
+  59               	/* prologue end (size=0) */
+  60 0028 D09A      		sbi 58-0x20,0
+  61 002a 9AE0      		ldi r25,lo8(10)
+  62 002c 892F      		mov r24,r25
+  63               	/* #APP */
+  64 002e 8A95      		1: dec r24
+  65 0030 F1F7      		brne 1b
+  66               	/* #NOAPP */
+  67 0032 D89A      		sbi 59-0x20,0
+  68 0034 892F      		mov r24,r25
+  69               	/* #APP */
+  70 0036 8A95      		1: dec r24
+  71 0038 F1F7      		brne 1b
+  72               	/* #NOAPP */
+  73 003a C899      		sbic 57-0x20,0
+  74 003c 03C0      		rjmp .L12
+  75 003e 1092 0000 		sts state,__zero_reg__
+  76 0042 0AC0      		rjmp .L14
+  77               	.L12:
+  78 0044 D898      		cbi 59-0x20,0
+  79               	/* #APP */
+  80 0046 9A95      		1: dec r25
+  81 0048 F1F7      		brne 1b
+  82               	/* #NOAPP */
+  83 004a C89B      		sbis 57-0x20,0
+  84 004c 02C0      		rjmp .L15
+  85 004e 81E0      		ldi r24,lo8(1)
+  86 0050 01C0      		rjmp .L18
+  87               	.L15:
+  88 0052 82E0      		ldi r24,lo8(2)
+  89               	.L18:
+  90 0054 8093 0000 		sts state,r24
+  91               	.L14:
+  92 0058 D898      		cbi 59-0x20,0
+  93 005a D098      		cbi 58-0x20,0
+  94               	/* epilogue: frame size=0 */
+  95 005c 0895      		ret
+  96               	/* epilogue end (size=1) */
+  97               	/* function check_keys size 33 (32) */
+  99               	.global	set_b
+ 101               	set_b:
+ 102               	/* prologue: frame size=0 */
+ 103               	/* prologue end (size=0) */
+ 104 005e 8823      		tst r24
+ 105 0060 11F0      		breq .L20
+ 106 0062 DD9A      		sbi 59-0x20,5
+ 107 0064 01C0      		rjmp .L22
+ 108               	.L20:
+ 109 0066 DD98      		cbi 59-0x20,5
+ 110               	.L22:
+ 111 0068 82E7      		ldi r24,lo8(114)
+ 112 006a 90E0      		ldi r25,hi8(114)
+ 113 006c CFDF      		rcall delay_us
+ 114               	/* epilogue: frame size=0 */
+ 115 006e 0895      		ret
+ 116               	/* epilogue end (size=1) */
+ 117               	/* function set_b size 9 (8) */
+ 119               	.global	set_dir
+ 121               	set_dir:
+ 122               	/* prologue: frame size=0 */
+ 123               	/* prologue end (size=0) */
+ 124 0070 8130      		cpi r24,lo8(1)
+ 125 0072 29F4      		brne .L25
+ 126 0074 8BB3      		in r24,59-0x20
+ 127 0076 8B7D      		andi r24,lo8(-37)
+ 128 0078 8BBB      		out 59-0x20,r24
+ 129 007a D59A      		sbi 58-0x20,5
+ 130 007c 02C0      		rjmp .L27
+ 131               	.L25:
+ 132 007e DA9A      		sbi 59-0x20,2
+ 133 0080 D598      		cbi 58-0x20,5
+ 134               	.L27:
+ 135 0082 80E5      		ldi r24,lo8(-15536)
+ 136 0084 93EC      		ldi r25,hi8(-15536)
+ 137 0086 C2DF      		rcall delay_us
+ 138               	/* epilogue: frame size=0 */
+ 139 0088 0895      		ret
+ 140               	/* epilogue end (size=1) */
+ 141               	/* function set_dir size 13 (12) */
+ 143               	.global	beep
+ 145               	beep:
+ 146               	/* prologue: frame size=0 */
+ 147 008a CF93      		push r28
+ 148 008c DF93      		push r29
+ 149               	/* prologue end (size=2) */
+ 150 008e DB9A      		sbi 59-0x20,3
+ 151 0090 8BB3      		in r24,59-0x20
+ 152 0092 8F73      		andi r24,lo8(63)
+ 153 0094 8BBB      		out 59-0x20,r24
+ 154 0096 DE9A      		sbi 59-0x20,6
+ 155 0098 84EF      		ldi r24,lo8(500)
+ 156 009a 91E0      		ldi r25,hi8(500)
+ 157 009c B7DF      		rcall delay_us
+ 158 009e 8BB3      		in r24,59-0x20
+ 159 00a0 90EC      		ldi r25,lo8(-64)
+ 160 00a2 8927      		eor r24,r25
+ 161 00a4 8BBB      		out 59-0x20,r24
+ 162 00a6 84EF      		ldi r24,lo8(500)
+ 163 00a8 91E0      		ldi r25,hi8(500)
+ 164 00aa B0DF      		rcall delay_us
+ 165 00ac 8BB3      		in r24,59-0x20
+ 166 00ae 8F73      		andi r24,lo8(63)
+ 167 00b0 8BBB      		out 59-0x20,r24
+ 168 00b2 C0E0      		ldi r28,lo8(0)
+ 169 00b4 D0E0      		ldi r29,hi8(0)
+ 170               	.L30:
+ 171 00b6 88EE      		ldi r24,lo8(1000)
+ 172 00b8 93E0      		ldi r25,hi8(1000)
+ 173 00ba A8DF      		rcall delay_us
+ 174 00bc 2196      		adiw r28,1
+ 175 00be CA30      		cpi r28,10
+ 176 00c0 D105      		cpc r29,__zero_reg__
+ 177 00c2 C9F7      		brne .L30
+ 178 00c4 DE9A      		sbi 59-0x20,6
+ 179 00c6 84EF      		ldi r24,lo8(500)
+ 180 00c8 91E0      		ldi r25,hi8(500)
+ 181 00ca A0DF      		rcall delay_us
+ 182 00cc 8BB3      		in r24,59-0x20
+ 183 00ce 90EC      		ldi r25,lo8(-64)
+ 184 00d0 8927      		eor r24,r25
+ 185 00d2 8BBB      		out 59-0x20,r24
+ 186 00d4 84EF      		ldi r24,lo8(500)
+ 187 00d6 91E0      		ldi r25,hi8(500)
+ 188 00d8 99DF      		rcall delay_us
+ 189 00da 8BB3      		in r24,59-0x20
+ 190 00dc 8F73      		andi r24,lo8(63)
+ 191 00de 8BBB      		out 59-0x20,r24
+ 192 00e0 C0E0      		ldi r28,lo8(0)
+ 193 00e2 D0E0      		ldi r29,hi8(0)
+ 194               	.L32:
+ 195 00e4 88EE      		ldi r24,lo8(1000)
+ 196 00e6 93E0      		ldi r25,hi8(1000)
+ 197 00e8 91DF      		rcall delay_us
+ 198 00ea 2196      		adiw r28,1
+ 199 00ec 81E0      		ldi r24,hi8(500)
+ 200 00ee C43F      		cpi r28,lo8(500)
+ 201 00f0 D807      		cpc r29,r24
+ 202 00f2 C1F7      		brne .L32
+ 203 00f4 DB98      		cbi 59-0x20,3
+ 204 00f6 C0E0      		ldi r28,lo8(0)
+ 205 00f8 D0E0      		ldi r29,hi8(0)
+ 206               	.L34:
+ 207 00fa 88EE      		ldi r24,lo8(1000)
+ 208 00fc 93E0      		ldi r25,hi8(1000)
+ 209 00fe 86DF      		rcall delay_us
+ 210 0100 2196      		adiw r28,1
+ 211 0102 81E0      		ldi r24,hi8(500)
+ 212 0104 C43F      		cpi r28,lo8(500)
+ 213 0106 D807      		cpc r29,r24
+ 214 0108 C1F7      		brne .L34
+ 215               	/* epilogue: frame size=0 */
+ 216 010a DF91      		pop r29
+ 217 010c CF91      		pop r28
+ 218 010e 0895      		ret
+ 219               	/* epilogue end (size=3) */
+ 220               	/* function beep size 67 (62) */
+ 222               	.global	blink
+ 224               	blink:
+ 225               	/* prologue: frame size=0 */
+ 226               	/* prologue end (size=0) */
+ 227 0110 81E0      		ldi r24,lo8(1)
+ 228 0112 76DF      		rcall set_led
+ 229 0114 8FEC      		ldi r24,lo8(3535)
+ 230 0116 9DE0      		ldi r25,hi8(3535)
+ 231 0118 79DF      		rcall delay_us
+ 232 011a 80E0      		ldi r24,lo8(0)
+ 233 011c 71DF      		rcall set_led
+ 234 011e 8FEC      		ldi r24,lo8(3535)
+ 235 0120 9DE0      		ldi r25,hi8(3535)
+ 236 0122 74DF      		rcall delay_us
+ 237               	/* epilogue: frame size=0 */
+ 238 0124 0895      		ret
+ 239               	/* epilogue end (size=1) */
+ 240               	/* function blink size 11 (10) */
+ 242               	.global	__vector_5
+ 244               	__vector_5:
+ 245               	/* prologue: frame size=0 */
+ 246 0126 1F92      		push __zero_reg__
+ 247 0128 0F92      		push __tmp_reg__
+ 248 012a 0FB6      		in __tmp_reg__,__SREG__
+ 249 012c 0F92      		push __tmp_reg__
+ 250 012e 1124      		clr __zero_reg__
+ 251 0130 8F93      		push r24
+ 252 0132 9F93      		push r25
+ 253               	/* prologue end (size=7) */
+ 254 0134 8091 0000 		lds r24,counter
+ 255 0138 9091 0000 		lds r25,(counter)+1
+ 256 013c 0196      		adiw r24,1
+ 257 013e 9093 0000 		sts (counter)+1,r25
+ 258 0142 8093 0000 		sts counter,r24
+ 259 0146 1EBC      		out 78-0x20,__zero_reg__
+ 260               	/* epilogue: frame size=0 */
+ 261 0148 9F91      		pop r25
+ 262 014a 8F91      		pop r24
+ 263 014c 0F90      		pop __tmp_reg__
+ 264 014e 0FBE      		out __SREG__,__tmp_reg__
+ 265 0150 0F90      		pop __tmp_reg__
+ 266 0152 1F90      		pop __zero_reg__
+ 267 0154 1895      		reti
+ 268               	/* epilogue end (size=7) */
+ 269               	/* function __vector_5 size 24 (10) */
+ 271               	.global	main
+ 273               	main:
+ 274               	/* prologue: frame size=2 */
+ 275 0156 C0E0      		ldi r28,lo8(__stack - 2)
+ 276 0158 D0E0      		ldi r29,hi8(__stack - 2)
+ 277 015a DEBF      		out __SP_H__,r29
+ 278 015c CDBF      		out __SP_L__,r28
+ 279               	/* prologue end (size=4) */
+ 280 015e 92E0      		ldi r25,lo8(2)
+ 281 0160 9BBB      		out 59-0x20,r25
+ 282 0162 8DEC      		ldi r24,lo8(-51)
+ 283 0164 8ABB      		out 58-0x20,r24
+ 284 0166 9BBB      		out 59-0x20,r25
+ 285 0168 10BE      		out 80-0x20,__zero_reg__
+ 286 016a 81E2      		ldi r24,lo8(33)
+ 287 016c 8FBD      		out 79-0x20,r24
+ 288 016e 1EBC      		out 78-0x20,__zero_reg__
+ 289 0170 89B7      		in r24,89-0x20
+ 290 0172 8460      		ori r24,lo8(4)
+ 291 0174 89BF      		out 89-0x20,r24
+ 292 0176 80E0      		ldi r24,lo8(0)
+ 293 0178 7BDF      		rcall set_dir
+ 294               	.L57:
+ 295 017a 62E0      		ldi r22,lo8(2)
+ 296 017c 8C2F      		mov r24,r28
+ 297 017e 9D2F      		mov r25,r29
+ 298 0180 0196      		adiw r24,1
+ 299 0182 00D0      		rcall recv
+ 300 0184 9981      		ldd r25,Y+1
+ 301 0186 8091 0000 		lds r24,turn_on_sequence
+ 302 018a 9817      		cp r25,r24
+ 303 018c B1F7      		brne .L57
+ 304 018e 9A81      		ldd r25,Y+2
+ 305 0190 8091 0000 		lds r24,turn_on_sequence+1
+ 306 0194 9817      		cp r25,r24
+ 307 0196 89F7      		brne .L57
+ 308 0198 78DF      		rcall beep
+ 309 019a EFCF      		rjmp .L57
+ 310               	/* epilogue: frame size=2 */
+ 311               	/* epilogue: noreturn */
+ 312               	/* epilogue end (size=0) */
+ 313               	/* function main size 35 (31) */
+ 315               	.global	get
+ 317               	get:
+ 318               	/* prologue: frame size=0 */
+ 319 019c 1F93      		push r17
+ 320               	/* prologue end (size=1) */
+ 321 019e 19B3      		in r17,57-0x20
+ 322 01a0 43DF      		rcall check_keys
+ 323 01a2 812F      		mov r24,r17
+ 324 01a4 9927      		clr r25
+ 325 01a6 81FD      		sbrc r24,1
+ 326 01a8 26C0      		rjmp .L59
+ 327 01aa 81E0      		ldi r24,lo8(1)
+ 328 01ac 29DF      		rcall set_led
+ 329 01ae 81E0      		ldi r24,lo8(1)
+ 330 01b0 5FDF      		rcall set_dir
+ 331 01b2 10E0      		ldi r17,lo8(0)
+ 332               	.L61:
+ 333 01b4 8091 0000 		lds r24,state
+ 334 01b8 8823      		tst r24
+ 335 01ba 21F4      		brne .L62
+ 336 01bc 62E0      		ldi r22,lo8(2)
+ 337 01be 80E0      		ldi r24,lo8(turn_on_sequence)
+ 338 01c0 90E0      		ldi r25,hi8(turn_on_sequence)
+ 339 01c2 0BC0      		rjmp .L72
+ 340               	.L62:
+ 341 01c4 8091 0000 		lds r24,state
+ 342 01c8 8130      		cpi r24,lo8(1)
+ 343 01ca 21F4      		brne .L65
+ 344 01cc 62E0      		ldi r22,lo8(2)
+ 345 01ce 80E0      		ldi r24,lo8(turn_on_sequence1)
+ 346 01d0 90E0      		ldi r25,hi8(turn_on_sequence1)
+ 347 01d2 03C0      		rjmp .L72
+ 348               	.L65:
+ 349 01d4 62E0      		ldi r22,lo8(2)
+ 350 01d6 80E0      		ldi r24,lo8(turn_on_sequence2)
+ 351 01d8 90E0      		ldi r25,hi8(turn_on_sequence2)
+ 352               	.L72:
+ 353 01da 00D0      		rcall send
+ 354 01dc 88EE      		ldi r24,lo8(1000)
+ 355 01de 93E0      		ldi r25,hi8(1000)
+ 356 01e0 15DF      		rcall delay_us
+ 357 01e2 1F5F      		subi r17,lo8(-(1))
+ 358 01e4 1530      		cpi r17,lo8(5)
+ 359 01e6 31F7      		brne .L61
+ 360 01e8 80E0      		ldi r24,lo8(0)
+ 361 01ea 42DF      		rcall set_dir
+ 362 01ec 80E0      		ldi r24,lo8(0)
+ 363 01ee 08DF      		rcall set_led
+ 364 01f0 80E0      		ldi r24,lo8(0)
+ 365 01f2 90E0      		ldi r25,hi8(0)
+ 366 01f4 07C0      		rjmp .L68
+ 367               	.L59:
+ 368 01f6 25E0      		ldi r18,5
+ 369 01f8 9695      	1:	lsr r25
+ 370 01fa 8795      		ror r24
+ 371 01fc 2A95      		dec r18
+ 372 01fe E1F7      		brne 1b
+ 373 0200 8170      		andi r24,lo8(1)
+ 374 0202 9070      		andi r25,hi8(1)
+ 375               	.L68:
+ 376               	/* epilogue: frame size=0 */
+ 377 0204 1F91      		pop r17
+ 378 0206 0895      		ret
+ 379               	/* epilogue end (size=2) */
+ 380               	/* function get size 54 (51) */
+ 382               	.global	wait_trans
+ 384               	wait_trans:
+ 385               	/* prologue: frame size=0 */
+ 386 0208 1F93      		push r17
+ 387 020a CF93      		push r28
+ 388 020c DF93      		push r29
+ 389               	/* prologue end (size=3) */
+ 390 020e D92F      		mov r29,r25
+ 391 0210 C82F      		mov r28,r24
+ 392 0212 C4DF      		rcall get
+ 393 0214 182F      		mov r17,r24
+ 394 0216 1092 0000 		sts (counter)+1,__zero_reg__
+ 395 021a 1092 0000 		sts counter,__zero_reg__
+ 396 021e 05C0      		rjmp .L74
+ 397               	.L75:
+ 398 0220 BDDF      		rcall get
+ 399 0222 1817      		cp r17,r24
+ 400 0224 11F0      		breq .L74
+ 401 0226 9927      		clr r25
+ 402 0228 09C0      		rjmp .L78
+ 403               	.L74:
+ 404 022a 8091 0000 		lds r24,counter
+ 405 022e 9091 0000 		lds r25,(counter)+1
+ 406 0232 8C17      		cp r24,r28
+ 407 0234 9D07      		cpc r25,r29
+ 408 0236 A0F3      		brlo .L75
+ 409 0238 82E0      		ldi r24,lo8(2)
+ 410 023a 90E0      		ldi r25,hi8(2)
+ 411               	.L78:
+ 412               	/* epilogue: frame size=0 */
+ 413 023c DF91      		pop r29
+ 414 023e CF91      		pop r28
+ 415 0240 1F91      		pop r17
+ 416 0242 0895      		ret
+ 417               	/* epilogue end (size=4) */
+ 418               	/* function wait_trans size 30 (23) */
+ 420               	.global	get_b
+ 422               	get_b:
+ 423               	/* prologue: frame size=0 */
+ 424 0244 0F93      		push r16
+ 425 0246 1F93      		push r17
+ 426               	/* prologue end (size=2) */
+ 427 0248 182F      		mov r17,r24
+ 428 024a A8DF      		rcall get
+ 429 024c 082F      		mov r16,r24
+ 430 024e 1123      		tst r17
+ 431 0250 59F0      		breq .L84
+ 432 0252 80E4      		ldi r24,lo8(320)
+ 433 0254 91E0      		ldi r25,hi8(320)
+ 434 0256 D8DF      		rcall wait_trans
+ 435 0258 8230      		cpi r24,lo8(2)
+ 436 025a 18F0      		brlo .L86
+ 437 025c 82E0      		ldi r24,lo8(2)
+ 438 025e 90E0      		ldi r25,hi8(2)
+ 439 0260 08C0      		rjmp .L88
+ 440               	.L86:
+ 441 0262 8BE1      		ldi r24,lo8(27)
+ 442 0264 90E0      		ldi r25,hi8(27)
+ 443 0266 02C0      		rjmp .L90
+ 444               	.L84:
+ 445 0268 82E2      		ldi r24,lo8(34)
+ 446 026a 90E0      		ldi r25,hi8(34)
+ 447               	.L90:
+ 448 026c CFDE      		rcall delay_us
+ 449 026e 802F      		mov r24,r16
+ 450 0270 9927      		clr r25
+ 451               	.L88:
+ 452               	/* epilogue: frame size=0 */
+ 453 0272 1F91      		pop r17
+ 454 0274 0F91      		pop r16
+ 455 0276 0895      		ret
+ 456               	/* epilogue end (size=3) */
+ 457               	/* function get_b size 26 (21) */
+ 459               	.global	wait_start
+ 461               	wait_start:
+ 462               	/* prologue: frame size=0 */
+ 463 0278 1F93      		push r17
+ 464 027a CF93      		push r28
+ 465 027c DF93      		push r29
+ 466               	/* prologue end (size=3) */
+ 467 027e 1092 0000 		sts (counter)+1,__zero_reg__
+ 468 0282 1092 0000 		sts counter,__zero_reg__
+ 469               	/* #APP */
+ 470 0286 7894      		sei
+ 471               	/* #NOAPP */
+ 472 0288 C0E0      		ldi r28,lo8(0)
+ 473 028a D0E0      		ldi r29,hi8(0)
+ 474               	.L109:
+ 475 028c 87DF      		rcall get
+ 476 028e 182F      		mov r17,r24
+ 477 0290 8823      		tst r24
+ 478 0292 E1F3      		breq .L109
+ 479 0294 88E2      		ldi r24,lo8(40)
+ 480 0296 90E0      		ldi r25,hi8(40)
+ 481 0298 B7DF      		rcall wait_trans
+ 482 029a 8230      		cpi r24,lo8(2)
+ 483 029c B9F7      		brne .L109
+ 484               	.L95:
+ 485 029e 7EDF      		rcall get
+ 486 02a0 282F      		mov r18,r24
+ 487 02a2 8117      		cp r24,r17
+ 488 02a4 29F0      		breq .L96
+ 489 02a6 CC0F      		lsl r28
+ 490 02a8 DD1F      		rol r29
+ 491 02aa 9927      		clr r25
+ 492 02ac C82B      		or r28,r24
+ 493 02ae D92B      		or r29,r25
+ 494               	.L96:
+ 495 02b0 122F      		mov r17,r18
+ 496 02b2 85E5      		ldi r24,hi8(21845)
+ 497 02b4 C535      		cpi r28,lo8(21845)
+ 498 02b6 D807      		cpc r29,r24
+ 499 02b8 91F7      		brne .L95
+ 500 02ba 8CE3      		ldi r24,lo8(60)
+ 501 02bc 90E0      		ldi r25,hi8(60)
+ 502 02be A4DF      		rcall wait_trans
+ 503 02c0 80E3      		ldi r24,lo8(560)
+ 504 02c2 92E0      		ldi r25,hi8(560)
+ 505 02c4 A1DF      		rcall wait_trans
+ 506 02c6 8130      		cpi r24,lo8(1)
+ 507 02c8 09F7      		brne .L109
+ 508 02ca 8CE3      		ldi r24,lo8(60)
+ 509 02cc 90E0      		ldi r25,hi8(60)
+ 510 02ce 9CDF      		rcall wait_trans
+ 511 02d0 8823      		tst r24
+ 512 02d2 E1F6      		brne .L109
+ 513 02d4 8CE2      		ldi r24,lo8(44)
+ 514 02d6 90E0      		ldi r25,hi8(44)
+ 515 02d8 99DE      		rcall delay_us
+ 516               	/* epilogue: frame size=0 */
+ 517 02da DF91      		pop r29
+ 518 02dc CF91      		pop r28
+ 519 02de 1F91      		pop r17
+ 520 02e0 0895      		ret
+ 521               	/* epilogue end (size=4) */
+ 522               	/* function wait_start size 54 (47) */
+ 524               	.global	counter
+ 525               	.global	counter
+ 526               		.section .bss
+ 529               	counter:
+ 530 0000 0000      		.skip 2,0
+ 531               	.global	state
+ 532               	.global	state
+ 535               	state:
+ 536 0002 00        		.skip 1,0
+ 537               		.data
+ 540               	turn_on_sequence:
+ 541 0000 4255 00   		.string	"BU"
+ 544               	turn_on_sequence1:
+ 545 0003 4253 00   		.string	"BS"
+ 548               	turn_on_sequence2:
+ 549 0006 424F 00   		.string	"BO"
+ 550               	/* File "main.c": code  378 = 0x017a ( 328), prologues  22, epilogues  28 */
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+     /tmp/ccDQtIjE.s:3      *ABS*:0000003f __SREG__
+     /tmp/ccDQtIjE.s:4      *ABS*:0000003e __SP_H__
+     /tmp/ccDQtIjE.s:5      *ABS*:0000003d __SP_L__
+     /tmp/ccDQtIjE.s:6      *ABS*:00000000 __tmp_reg__
+     /tmp/ccDQtIjE.s:7      *ABS*:00000001 __zero_reg__
+     /tmp/ccDQtIjE.s:13     .text:00000000 set_led
+     /tmp/ccDQtIjE.s:30     .text:0000000c delay_us
+     /tmp/ccDQtIjE.s:57     .text:00000028 check_keys
+     /tmp/ccDQtIjE.s:535    .bss:00000002 state
+     /tmp/ccDQtIjE.s:101    .text:0000005e set_b
+     /tmp/ccDQtIjE.s:121    .text:00000070 set_dir
+     /tmp/ccDQtIjE.s:145    .text:0000008a beep
+     /tmp/ccDQtIjE.s:224    .text:00000110 blink
+     /tmp/ccDQtIjE.s:244    .text:00000126 __vector_5
+     /tmp/ccDQtIjE.s:529    .bss:00000000 counter
+     /tmp/ccDQtIjE.s:273    .text:00000156 main
+     /tmp/ccDQtIjE.s:540    .data:00000000 turn_on_sequence
+     /tmp/ccDQtIjE.s:317    .text:0000019c get
+     /tmp/ccDQtIjE.s:544    .data:00000003 turn_on_sequence1
+     /tmp/ccDQtIjE.s:548    .data:00000006 turn_on_sequence2
+     /tmp/ccDQtIjE.s:384    .text:00000208 wait_trans
+     /tmp/ccDQtIjE.s:422    .text:00000244 get_b
+     /tmp/ccDQtIjE.s:461    .text:00000278 wait_start
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss
+__stack
+recv
+send

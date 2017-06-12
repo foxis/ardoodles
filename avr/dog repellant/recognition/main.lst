@@ -1,0 +1,196 @@
+   1               		.file	"main.c"
+   2               		.arch attiny26
+   3               	__SREG__ = 0x3f
+   4               	__SP_H__ = 0x3e
+   5               	__SP_L__ = 0x3d
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.global __do_copy_data
+   9               		.global __do_clear_bss
+  10               		.text
+  11               	.global	delay_us
+  13               	delay_us:
+  14               	/* prologue: frame size=0 */
+  15               	/* prologue end (size=0) */
+  16 0000 282F      		mov r18,r24
+  17 0002 392F      		mov r19,r25
+  18 0004 93E0      		ldi r25,lo8(3)
+  19 0006 03C0      		rjmp .L2
+  20               	.L3:
+  21 0008 892F      		mov r24,r25
+  22               	/* #APP */
+  23 000a 8A95      		1: dec r24
+  24 000c F1F7      		brne 1b
+  25               	/* #NOAPP */
+  26               	.L2:
+  27 000e 2150      		subi r18,lo8(-(-1))
+  28 0010 3040      		sbci r19,hi8(-(-1))
+  29 0012 8FEF      		ldi r24,hi8(-1)
+  30 0014 2F3F      		cpi r18,lo8(-1)
+  31 0016 3807      		cpc r19,r24
+  32 0018 B9F7      		brne .L3
+  33               	/* epilogue: frame size=0 */
+  34 001a 0895      		ret
+  35               	/* epilogue end (size=1) */
+  36               	/* function delay_us size 16 (15) */
+  38               	.global	delay_ms
+  40               	delay_ms:
+  41               	/* prologue: frame size=0 */
+  42 001c CF93      		push r28
+  43 001e DF93      		push r29
+  44               	/* prologue end (size=2) */
+  45 0020 D92F      		mov r29,r25
+  46 0022 C82F      		mov r28,r24
+  47 0024 03C0      		rjmp .L7
+  48               	.L8:
+  49 0026 88EE      		ldi r24,lo8(1000)
+  50 0028 93E0      		ldi r25,hi8(1000)
+  51 002a EADF      		rcall delay_us
+  52               	.L7:
+  53 002c 2197      		sbiw r28,1
+  54 002e 8FEF      		ldi r24,hi8(-1)
+  55 0030 CF3F      		cpi r28,lo8(-1)
+  56 0032 D807      		cpc r29,r24
+  57 0034 C1F7      		brne .L8
+  58               	/* epilogue: frame size=0 */
+  59 0036 DF91      		pop r29
+  60 0038 CF91      		pop r28
+  61 003a 0895      		ret
+  62               	/* epilogue end (size=3) */
+  63               	/* function delay_ms size 16 (11) */
+  65               	.global	main
+  67               	main:
+  68               	/* prologue: frame size=0 */
+  69 003c C0E0      		ldi r28,lo8(__stack - 0)
+  70 003e D0E0      		ldi r29,hi8(__stack - 0)
+  71 0040 DEBF      		out __SP_H__,r29
+  72 0042 CDBF      		out __SP_L__,r28
+  73               	/* prologue end (size=4) */
+  74 0044 1BBA      		out 59-0x20,__zero_reg__
+  75 0046 80EC      		ldi r24,lo8(-64)
+  76 0048 8ABB      		out 58-0x20,r24
+  77 004a 80E8      		ldi r24,lo8(-128)
+  78 004c 8BBB      		out 59-0x20,r24
+  79 004e 17BA      		out 55-0x20,__zero_reg__
+  80 0050 18BA      		out 56-0x20,__zero_reg__
+  81 0052 80EA      		ldi r24,lo8(-96)
+  82 0054 87B9      		out 39-0x20,r24
+  83 0056 8EEE      		ldi r24,lo8(-18)
+  84 0058 86B9      		out 38-0x20,r24
+  85               	/* #APP */
+  86 005a 7894      		sei
+  87               	/* #NOAPP */
+  88               	.L29:
+  89 005c 26B3      		in r18,54-0x20
+  90 005e 8091 0000 		lds r24,I
+  91 0062 8138      		cpi r24,lo8(-127)
+  92 0064 10F4      		brsh .L13
+  93 0066 26FF      		sbrs r18,6
+  94 0068 F9CF      		rjmp .L29
+  95               	.L13:
+  96 006a 8091 0000 		lds r24,P
+  97 006e 9091 0000 		lds r25,(P)+1
+  98 0072 8150      		subi r24,lo8(8193)
+  99 0074 9042      		sbci r25,hi8(8193)
+ 100 0076 10F4      		brsh .L15
+ 101 0078 26FF      		sbrs r18,6
+ 102 007a 16C0      		rjmp .L17
+ 103               	.L15:
+ 104 007c CD99      		sbic 57-0x20,5
+ 105 007e 14C0      		rjmp .L17
+ 106               	/* #APP */
+ 107 0080 F894      		cli
+ 108               	/* #NOAPP */
+ 109 0082 DE9A      		sbi 59-0x20,6
+ 110 0084 DF98      		cbi 59-0x20,7
+ 111 0086 CC99      		sbic 57-0x20,4
+ 112 0088 03C0      		rjmp .L19
+ 113 008a 88E8      		ldi r24,lo8(5000)
+ 114 008c 93E1      		ldi r25,hi8(5000)
+ 115 008e 02C0      		rjmp .L28
+ 116               	.L19:
+ 117 0090 80ED      		ldi r24,lo8(2000)
+ 118 0092 97E0      		ldi r25,hi8(2000)
+ 119               	.L28:
+ 120 0094 C3DF      		rcall delay_ms
+ 121 0096 DF9A      		sbi 59-0x20,7
+ 122 0098 84EF      		ldi r24,lo8(500)
+ 123 009a 91E0      		ldi r25,hi8(500)
+ 124 009c BFDF      		rcall delay_ms
+ 125 009e DE98      		cbi 59-0x20,6
+ 126 00a0 88E8      		ldi r24,lo8(5000)
+ 127 00a2 93E1      		ldi r25,hi8(5000)
+ 128 00a4 BBDF      		rcall delay_ms
+ 129               	/* #APP */
+ 130 00a6 7894      		sei
+ 131               	/* #NOAPP */
+ 132               	.L17:
+ 133 00a8 1092 0000 		sts I,__zero_reg__
+ 134 00ac 1092 0000 		sts (P)+1,__zero_reg__
+ 135 00b0 1092 0000 		sts P,__zero_reg__
+ 136 00b4 D3CF      		rjmp .L29
+ 137               	/* epilogue: frame size=0 */
+ 138               	/* epilogue: noreturn */
+ 139               	/* epilogue end (size=0) */
+ 140               	/* function main size 65 (61) */
+ 142               	.global	__vector_11
+ 144               	__vector_11:
+ 145               	/* prologue: frame size=0 */
+ 146 00b6 1F92      		push __zero_reg__
+ 147 00b8 0F92      		push __tmp_reg__
+ 148 00ba 0FB6      		in __tmp_reg__,__SREG__
+ 149 00bc 0F92      		push __tmp_reg__
+ 150 00be 1124      		clr __zero_reg__
+ 151 00c0 2F93      		push r18
+ 152 00c2 3F93      		push r19
+ 153 00c4 8F93      		push r24
+ 154               	/* prologue end (size=8) */
+ 155 00c6 85B1      		in r24,37-0x20
+ 156 00c8 2091 0000 		lds r18,P
+ 157 00cc 3091 0000 		lds r19,(P)+1
+ 158 00d0 280F      		add r18,r24
+ 159 00d2 311D      		adc r19,__zero_reg__
+ 160 00d4 3093 0000 		sts (P)+1,r19
+ 161 00d8 2093 0000 		sts P,r18
+ 162 00dc 8091 0000 		lds r24,I
+ 163 00e0 8F5F      		subi r24,lo8(-(1))
+ 164 00e2 8093 0000 		sts I,r24
+ 165               	/* epilogue: frame size=0 */
+ 166 00e6 8F91      		pop r24
+ 167 00e8 3F91      		pop r19
+ 168 00ea 2F91      		pop r18
+ 169 00ec 0F90      		pop __tmp_reg__
+ 170 00ee 0FBE      		out __SREG__,__tmp_reg__
+ 171 00f0 0F90      		pop __tmp_reg__
+ 172 00f2 1F90      		pop __zero_reg__
+ 173 00f4 1895      		reti
+ 174               	/* epilogue end (size=8) */
+ 175               	/* function __vector_11 size 32 (16) */
+ 177               	.global	P
+ 178               	.global	P
+ 179               		.section .bss
+ 182               	P:
+ 183 0000 0000      		.skip 2,0
+ 184               	.global	I
+ 185               	.global	I
+ 188               	I:
+ 189 0002 00        		.skip 1,0
+ 190               	/* File "main.c": code  129 = 0x0081 ( 103), prologues  14, epilogues  12 */
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+     /tmp/ccVfi4Nb.s:3      *ABS*:0000003f __SREG__
+     /tmp/ccVfi4Nb.s:4      *ABS*:0000003e __SP_H__
+     /tmp/ccVfi4Nb.s:5      *ABS*:0000003d __SP_L__
+     /tmp/ccVfi4Nb.s:6      *ABS*:00000000 __tmp_reg__
+     /tmp/ccVfi4Nb.s:7      *ABS*:00000001 __zero_reg__
+     /tmp/ccVfi4Nb.s:13     .text:00000000 delay_us
+     /tmp/ccVfi4Nb.s:40     .text:0000001c delay_ms
+     /tmp/ccVfi4Nb.s:67     .text:0000003c main
+     /tmp/ccVfi4Nb.s:188    .bss:00000002 I
+     /tmp/ccVfi4Nb.s:182    .bss:00000000 P
+     /tmp/ccVfi4Nb.s:144    .text:000000b6 __vector_11
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss
+__stack

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>988077462</fileChecksum>
+  <configuration>
+    <name>Release</name>
+    <outputs>
+      <file>$PROJ_DIR$\Release\Obj\mcb_param.r43</file>
+      <file>$PROJ_DIR$\Release\Exe\msp.a43</file>
+      <file>$PROJ_DIR$\Release\Obj\msp.pbd</file>
+      <file>$TOOLKIT_DIR$\config\multiplier32_loc2.xcl</file>
+      <file>$PROJ_DIR$\Release\Obj\main.r43</file>
+      <file>$PROJ_DIR$\Release\Exe\msp.txt</file>
+      <file>$TOOLKIT_DIR$\inc\in430.h</file>
+      <file>$TOOLKIT_DIR$\config\lnk430F2272.xcl</file>
+      <file>$PROJ_DIR$\src\filter.h</file>
+      <file>$PROJ_DIR$\Release\List\mcb_param.lst</file>
+      <file>$PROJ_DIR$\Release\List\msp.map</file>
+      <file>$PROJ_DIR$\src\periph.h</file>
+      <file>$PROJ_DIR$\Release\Exe\msp.ulp</file>
+      <file>$PROJ_DIR$\Release\Obj\main_still.pbi</file>
+      <file>$PROJ_DIR$\src\main_still.c</file>
+      <file>$TOOLKIT_DIR$\inc\msp430f2272.h</file>
+      <file>$TOOLKIT_DIR$\config\lnkCC430F5133.xcl</file>
+      <file>$PROJ_DIR$\Release\Obj\mcb_param.pbi</file>
+      <file>$PROJ_DIR$\Release\List\main_still.lst</file>
+      <file>$PROJ_DIR$\Release\List\main.lst</file>
+      <file>$PROJ_DIR$\src\settings_7692.h</file>
+      <file>$PROJ_DIR$\src\mcb_param.h</file>
+      <file>$PROJ_DIR$\Release\Obj\main.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\msp430x21x2.h</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$TOOLKIT_DIR$\lib\dlib\dl430xsfn.r43</file>
+      <file>$TOOLKIT_DIR$\lib\dlib\dl430fn.r43</file>
+      <file>$TOOLKIT_DIR$\inc\msp430.h</file>
+      <file>$PROJ_DIR$\src\main.c</file>
+      <file>$PROJ_DIR$\src\settings_7695.h</file>
+      <file>$PROJ_DIR$\src\mcb_param.c</file>
+      <file>$PROJ_DIR$\Release\Obj\main_still.r43</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 1 10</file>
+        </tool>
+        <tool>
+          <name>ULP430</name>
+          <file> 12</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Release\Exe\msp.a43</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 10</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 7 4 26</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Release\Exe\msp.txt</name>
+      <inputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 16 3 4 25</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\main_still.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 13</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 18 31</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27 11 21</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 27 23 6 24 11 21</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\main.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 22</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 19 4</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27 15 6 24 11 8 29</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 27 15 6 24 11 8 29</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\mcb_param.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 17</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 9 0</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 21</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 21</file>
+        </tool>
+      </inputs>
+    </file>
+  </configuration>
+  <configuration>
+    <name>prog</name>
+    <outputs>
+      <file>$PROJ_DIR$\prog\List\main.lst</file>
+      <file>$TOOLKIT_DIR$\inc\in430.h</file>
+      <file>$TOOLKIT_DIR$\config\lnk430F2272.xcl</file>
+      <file>$PROJ_DIR$\src\filter.h</file>
+      <file>$PROJ_DIR$\src\periph.h</file>
+      <file>$TOOLKIT_DIR$\inc\msp430f2272.h</file>
+      <file>$PROJ_DIR$\src\settings_7692.h</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$TOOLKIT_DIR$\lib\dlib\dl430fn.r43</file>
+      <file>$TOOLKIT_DIR$\inc\msp430.h</file>
+      <file>$PROJ_DIR$\prog\List\msp.map</file>
+      <file>$PROJ_DIR$\prog\Obj\main.r43</file>
+      <file>$PROJ_DIR$\prog\Exe\msp.ulp</file>
+      <file>$PROJ_DIR$\prog\Exe\msp.a43</file>
+      <file>$PROJ_DIR$\prog\Obj\msp.pbd</file>
+      <file>$PROJ_DIR$\src\main.c</file>
+      <file>$PROJ_DIR$\src\settings_7695.h</file>
+      <file>$PROJ_DIR$\prog\Obj\main.pbi</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 13 10</file>
+        </tool>
+        <tool>
+          <name>ULP430</name>
+          <file> 12</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\prog\Exe\msp.a43</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 10</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 2 11 8</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\main.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 17</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 0 11</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 9 5 1 7 4 3 16</file>
+        </tool>
+        <tool>
+          <name>ICC430</name>
+          <file> 9 5 1 7 4 3 16</file>
+        </tool>
+      </inputs>
+    </file>
+  </configuration>
+</project>
+
+

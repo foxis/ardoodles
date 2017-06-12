@@ -1,0 +1,213 @@
+   1               		.file	"main.c"
+   2               	__SREG__ = 0x3f
+   3               	__SP_H__ = 0x3e
+   4               	__SP_L__ = 0x3d
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.global __do_copy_data
+   8               		.global __do_clear_bss
+  16               	.Ltext0:
+  17               	.global	delay_ms
+  19               	delay_ms:
+  20               	.LFB7:
+  21               	.LM1:
+  22               	/* prologue: frame size=0 */
+  23               	/* prologue end (size=0) */
+  24               	.LVL0:
+  25 0000 9C01      		movw r18,r24
+  26 0002 00C0      		rjmp .L2
+  27               	.LVL1:
+  28               	.L3:
+  29               	.LBB20:
+  30               	.LBB21:
+  31               	.LBB22:
+  32               	.LBB23:
+  33               	.LM2:
+  34 0004 80EA      		ldi r24,lo8(4000)
+  35 0006 9FE0      		ldi r25,hi8(4000)
+  36               	/* #APP */
+  37 0008 0197      		1: sbiw r24,1
+  38 000a 01F4      		brne 1b
+  39               	.LVL2:
+  40               	/* #NOAPP */
+  41               	.L2:
+  42               	.LBE23:
+  43               	.LBE22:
+  44               	.LBE21:
+  45               	.LBE20:
+  46               	.LM3:
+  47 000c 2150      		subi r18,lo8(-(-1))
+  48 000e 3040      		sbci r19,hi8(-(-1))
+  49 0010 8FEF      		ldi r24,hi8(-1)
+  50 0012 2F3F      		cpi r18,lo8(-1)
+  51 0014 3807      		cpc r19,r24
+  52 0016 01F4      		brne .L3
+  53               	/* epilogue: frame size=0 */
+  54 0018 0895      		ret
+  55               	/* epilogue end (size=1) */
+  56               	/* function delay_ms size 15 (14) */
+  57               	.LFE7:
+  59               	.global	main
+  61               	main:
+  62               	.LFB8:
+  63               	.LM4:
+  64               	/* prologue: frame size=0 */
+  65               	/* prologue end (size=0) */
+  66               	.LM5:
+  67 001a 8FEF      		ldi r24,lo8(-1)
+  68 001c 82B9      		out 34-0x20,r24
+  69               	.LM6:
+  70 001e 8093 6100 		sts 97,r24
+  71               	.LM7:
+  72 0022 8ABB      		out 58-0x20,r24
+  73               	.LM8:
+  74 0024 84BB      		out 52-0x20,r24
+  75 0026 50E0      		ldi r21,lo8(0)
+  76               	.LVL3:
+  77 0028 40E0      		ldi r20,lo8(0)
+  78               	.LVL4:
+  79 002a 61E0      		ldi r22,lo8(1)
+  80               	.LVL5:
+  81               	.L7:
+  82               	.LM9:
+  83 002c 15BA      		out 53-0x20,__zero_reg__
+  84               	.LM10:
+  85 002e 1BBA      		out 59-0x20,__zero_reg__
+  86               	.LM11:
+  87 0030 E52F      		mov r30,r21
+  88 0032 F0E0      		ldi r31,lo8(0)
+  89               	.LVL6:
+  90 0034 EE0F      		lsl r30
+  91 0036 FF1F      		rol r31
+  92               	.LVL7:
+  93 0038 E050      		subi r30,lo8(-(g_columns))
+  94 003a F040      		sbci r31,hi8(-(g_columns))
+  95 003c 0190      		ld __tmp_reg__,Z+
+  96 003e F081      		ld r31,Z
+  97 0040 E02D      		mov r30,__tmp_reg__
+  98               	.LVL8:
+  99               	.LM12:
+ 100 0042 5F5F      		subi r21,lo8(-(1))
+ 101               	.LVL9:
+ 102 0044 5031      		cpi r21,lo8(16)
+ 103 0046 01F4      		brne .L8
+ 104 0048 50E0      		ldi r21,lo8(0)
+ 105               	.L8:
+ 106 004a 242F      		mov r18,r20
+ 107 004c 3327      		clr r19
+ 108 004e 27FD      		sbrc r18,7
+ 109 0050 3095      		com r19
+ 110               	.LVL10:
+ 111               	.LM13:
+ 112 0052 6130      		cpi r22,lo8(1)
+ 113 0054 01F4      		brne .L10
+ 114               	.LM14:
+ 115 0056 80E8      		ldi r24,lo8(128)
+ 116 0058 90E0      		ldi r25,hi8(128)
+ 117 005a 00C0      		rjmp 2f
+ 118 005c 9595      	1:	asr r25
+ 119 005e 8795      		ror r24
+ 120 0060 2A95      	2:	dec r18
+ 121 0062 02F4      		brpl 1b
+ 122 0064 83B9      		out 35-0x20,r24
+ 123               	.LM15:
+ 124 0066 1092 6200 		sts 98,__zero_reg__
+ 125               	.LM16:
+ 126 006a 842F      		mov r24,r20
+ 127 006c 8F5F      		subi r24,lo8(-(1))
+ 128               	.LM17:
+ 129 006e 8830      		cpi r24,lo8(8)
+ 130 0070 01F4      		brne .L12
+ 131               	.LVL11:
+ 132 0072 47E0      		ldi r20,lo8(7)
+ 133 0074 6FEF      		ldi r22,lo8(-1)
+ 134 0076 00C0      		rjmp .L14
+ 135               	.LVL12:
+ 136               	.L12:
+ 137               	.LM18:
+ 138 0078 482F      		mov r20,r24
+ 139 007a 00C0      		rjmp .L14
+ 140               	.LVL13:
+ 141               	.L10:
+ 142               	.LM19:
+ 143 007c 80E8      		ldi r24,lo8(128)
+ 144 007e 90E0      		ldi r25,hi8(128)
+ 145 0080 00C0      		rjmp 2f
+ 146 0082 9595      	1:	asr r25
+ 147 0084 8795      		ror r24
+ 148 0086 2A95      	2:	dec r18
+ 149 0088 02F4      		brpl 1b
+ 150 008a 8093 6200 		sts 98,r24
+ 151               	.LM20:
+ 152 008e 13B8      		out 35-0x20,__zero_reg__
+ 153               	.LM21:
+ 154 0090 460F      		add r20,r22
+ 155               	.LVL14:
+ 156               	.LM22:
+ 157 0092 4F3F      		cpi r20,lo8(-1)
+ 158 0094 01F4      		brne .L14
+ 159 0096 40E0      		ldi r20,lo8(0)
+ 160 0098 61E0      		ldi r22,lo8(1)
+ 161               	.L14:
+ 162               	.LM23:
+ 163 009a E5BB      		out 53-0x20,r30
+ 164               	.LM24:
+ 165 009c FBBB      		out 59-0x20,r31
+ 166               	.LVL15:
+ 167               	.LBB34:
+ 168               	.LBB35:
+ 169               	.LBB36:
+ 170               	.LBB37:
+ 171               	.LM25:
+ 172 009e 85E3      		ldi r24,lo8(53)
+ 173               	.LVL16:
+ 174               	/* #APP */
+ 175 00a0 8A95      		1: dec r24
+ 176 00a2 01F4      		brne 1b
+ 177               	/* #NOAPP */
+ 178 00a4 00C0      		rjmp .L7
+ 179               	.LBE37:
+ 180               	.LBE36:
+ 181               	.LBE35:
+ 182               	.LBE34:
+ 183               	/* epilogue: frame size=0 */
+ 184               	/* epilogue: noreturn */
+ 185               	/* epilogue end (size=0) */
+ 186               	/* function main size 74 (74) */
+ 187               	.LFE8:
+ 189               	.global	g_columns
+ 190               		.data
+ 193               	g_columns:
+ 194 0000 0101      		.word	257
+ 195 0002 0202      		.word	514
+ 196 0004 0404      		.word	1028
+ 197 0006 0808      		.word	2056
+ 198 0008 1010      		.word	4112
+ 199 000a 2020      		.word	8224
+ 200 000c 4040      		.word	16448
+ 201 000e 8080      		.word	-32640
+ 202 0010 8080      		.word	-32640
+ 203 0012 4040      		.word	16448
+ 204 0014 2020      		.word	8224
+ 205 0016 1010      		.word	4112
+ 206 0018 0808      		.word	2056
+ 207 001a 0404      		.word	1028
+ 208 001c 0202      		.word	514
+ 209 001e 0101      		.word	257
+ 210               		.comm g_rows,2,1
+ 243               	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccA2uTRa.s:2      *ABS*:0000003f __SREG__
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccA2uTRa.s:3      *ABS*:0000003e __SP_H__
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccA2uTRa.s:4      *ABS*:0000003d __SP_L__
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccA2uTRa.s:5      *ABS*:00000000 __tmp_reg__
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccA2uTRa.s:6      *ABS*:00000001 __zero_reg__
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccA2uTRa.s:19     .text:00000000 delay_ms
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccA2uTRa.s:61     .text:0000001a main
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccA2uTRa.s:193    .data:00000000 g_columns
+                            *COM*:00000002 g_rows
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss

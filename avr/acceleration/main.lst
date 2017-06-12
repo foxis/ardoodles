@@ -1,0 +1,85 @@
+   1               		.file	"main.c"
+   2               	__SREG__ = 0x3f
+   3               	__SP_H__ = 0x3e
+   4               	__SP_L__ = 0x3d
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.global __do_copy_data
+   8               		.global __do_clear_bss
+  16               	.Ltext0:
+  17               	.global	main
+  19               	main:
+  20               	.LFB7:
+  21               	.LM1:
+  22               	/* prologue: frame size=0 */
+  23               	/* prologue end (size=0) */
+  24               	.LM2:
+  25 0000 11BA      		out 49-0x20,__zero_reg__
+  26               	.LM3:
+  27 0002 8FEF      		ldi r24,lo8(-1)
+  28 0004 87BB      		out 55-0x20,r24
+  29               	.LM4:
+  30 0006 0E94 0000 		call LcdInit
+  31               	.LM5:
+  32 000a 0E94 0000 		call LcdClear
+  33               	.L2:
+  34               	.LM6:
+  35 000e 88B3      		in r24,56-0x20
+  36 0010 91E0      		ldi r25,lo8(1)
+  37 0012 8927      		eor r24,r25
+  38 0014 88BB      		out 56-0x20,r24
+  39               	.LM7:
+  40 0016 88B3      		in r24,56-0x20
+  41 0018 92E0      		ldi r25,lo8(2)
+  42 001a 8927      		eor r24,r25
+  43 001c 88BB      		out 56-0x20,r24
+  44               	.LM8:
+  45 001e 88B3      		in r24,56-0x20
+  46 0020 94E0      		ldi r25,lo8(4)
+  47 0022 8927      		eor r24,r25
+  48 0024 88BB      		out 56-0x20,r24
+  49               	.LM9:
+  50 0026 88B3      		in r24,56-0x20
+  51 0028 98E0      		ldi r25,lo8(8)
+  52 002a 8927      		eor r24,r25
+  53 002c 88BB      		out 56-0x20,r24
+  54               	.LM10:
+  55 002e 88B3      		in r24,56-0x20
+  56 0030 90E1      		ldi r25,lo8(16)
+  57 0032 8927      		eor r24,r25
+  58 0034 88BB      		out 56-0x20,r24
+  59               	.LM11:
+  60 0036 88B3      		in r24,56-0x20
+  61 0038 90E2      		ldi r25,lo8(32)
+  62 003a 8927      		eor r24,r25
+  63 003c 88BB      		out 56-0x20,r24
+  64               	.LM12:
+  65 003e 88B3      		in r24,56-0x20
+  66 0040 90E4      		ldi r25,lo8(64)
+  67 0042 8927      		eor r24,r25
+  68 0044 88BB      		out 56-0x20,r24
+  69               	.LM13:
+  70 0046 88B3      		in r24,56-0x20
+  71 0048 8058      		subi r24,lo8(-(-128))
+  72 004a 88BB      		out 56-0x20,r24
+  73 004c 00C0      		rjmp .L2
+  74               	/* epilogue: frame size=0 */
+  75               	/* epilogue: noreturn */
+  76               	/* epilogue end (size=0) */
+  77               	/* function main size 39 (39) */
+  78               	.LFE7:
+ 104               	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccNwsGD4.s:2      *ABS*:0000003f __SREG__
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccNwsGD4.s:3      *ABS*:0000003e __SP_H__
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccNwsGD4.s:4      *ABS*:0000003d __SP_L__
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccNwsGD4.s:5      *ABS*:00000000 __tmp_reg__
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccNwsGD4.s:6      *ABS*:00000001 __zero_reg__
+C:\DOCUME~1\FoxIS\LOCALS~1\Temp/ccNwsGD4.s:19     .text:00000000 main
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss
+LcdInit
+LcdClear

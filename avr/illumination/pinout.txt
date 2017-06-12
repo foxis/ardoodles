@@ -1,0 +1,9 @@
+slave
+PB2 - databus    [ INT0 ]
+pwm pb1 pb0 pb4  [ OC0B,OC0A,OC1B ]
+ADC pb3
+
+master: out- PB0
+buttons pc7 pc6 pc5
+pc4 enc button
+enc pd1 pd2
