@@ -1,20 +1,11 @@
 #include <EEPROM.h>
-#include <SoftwareSerial.h>
-#include <OneWire.h>
-#include <Wire.h>
-#include <DallasTemperature.h>
 #include <SFE_BMP180.h>
-#include <nokia5110.h>
 #include <Switch.h>
+#include <Wire.h>
+#include <Adafruit_SSD1306.h>
 
-#define PIN_RESET 12  // LCD RST .... Pin 1
-                     // LCD Gnd .... Pin 2
-#define PIN_SCE   11  // LCD CS  .... Pin 3
-#define PIN_SCLK 13  // LCD SPIClk . Pin 4
-#define PIN_DC    10  // LCD Dat/Com. Pin 5
-#define PIN_SDIN  9  // LCD SPIDat . Pin 6
-                     // LCD Vlcd ... Pin 7
-                     // LCD Vcc .... Pin 8
+#define OLED_RESET 10
+Adafruit_SSD1306 display(OLED_RESET);
 
 #define pinA 2
 #define pinB 3
@@ -24,13 +15,7 @@
 #define buttonC 6
 #define buttonD 7
 
-// Define various ADC prescaler
-#define PS_16 = (1 << ADPS2);
-#define PS_32 = (1 << ADPS2) | (1 << ADPS0);
-#define PS_64 = (1 << ADPS2) | (1 << ADPS1);
-#define PS_128 = (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
-
-#define SHOT_STRING_LENGTH 60
+#define SHOT_STRING_LENGTH 50
 #define DEFAULT_DISTANCE 137
 #define DISTANCE_ADDR  0
 #define SHOT_COUNT_ADDR  1
@@ -38,21 +23,19 @@
 typedef struct shot_info_struct
 {
   float velocity;
-  int ambient_pressure;
-  byte ambient_temperature;
-  byte co2_temperature;
-  int co2_pressure;
-  unsigned long timestamp;
+  //unsigned long timestamp;
 } shot_info_t;
 
 enum DISPLAY_TYPE
 {
-  DT_SHOT_STRING = 0,
+  DT_UNKNOWN = -2,
+  DT_ABOUT_INIT = -1,
   DT_LAST_SHOT,
+  DT_SHOT_STRING,
   DT_SHOT_GRAPH,
 //  DT_SHOT_PREDICT,
   DT_ABOUT,
-  DT_TRANSFER,
+//  DT_TRANSFER,
   DT_NULL,
 };
 
@@ -66,22 +49,161 @@ volatile byte max_aval = 0; // maximum pressure
 unsigned long timestamp = 0;
 byte Distance = DEFAULT_DISTANCE;
 
-DISPLAY_TYPE display_type = DT_LAST_SHOT;
+DISPLAY_TYPE display_type = DT_ABOUT_INIT;
 int display_pos = 0;
 int display_pos1 = 0;
-unsigned long total_shot_count = 0;
+int total_shot_count = 0;
 int shot_count = 0;
 int last_shot_count = 0;
+int ambient_pressure;
+byte ambient_temperature;
 shot_info_t velocity_values[SHOT_STRING_LENGTH] = {0, };
+char buf[16] = "";
+char buf1[16] = "";
 
-Nokia5110 lcd(12,11,13,10,9);
+
 Switch buttonUp = Switch(buttonA, INPUT_PULLUP, LOW, 3, 1000, 50);
 Switch buttonDown = Switch(buttonB, INPUT_PULLUP, LOW, 3, 1000, 50);
 Switch buttonEx1 = Switch(buttonC, INPUT_PULLUP, LOW, 3, 1000, 50);
 Switch buttonEx2 = Switch(buttonD, INPUT_PULLUP, LOW, 3, 1000, 50);
-OneWire tempSensorBus(A1);
-DallasTemperature tempSensor(&tempSensorBus);
 SFE_BMP180 pressureSensor;
+
+long readVcc() 
+{
+  // Read 1.1V reference against AVcc
+  // set the reference to Vcc and the measurement to the internal 1.1V reference
+  #if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+    ADMUX = _BV(REFS0) | _BV(MUX4) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
+  #elif defined (__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+     ADMUX = _BV(MUX5) | _BV(MUX0) ;
+  #else
+    ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
+  #endif  
+ 
+  delay(2); // Wait for Vref to settle
+  ADCSRA |= _BV(ADSC); // Start conversion
+  while (bit_is_set(ADCSRA,ADSC)); // measuring
+ 
+  uint8_t low  = ADCL; // must read ADCL first - it then locks ADCH  
+  uint8_t high = ADCH; // unlocks both
+ 
+  long result = (high<<8) | low;
+ 
+  result = 1125300L / result; // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000
+  return result; // Vcc in millivolts
+}
+
+void printAt(byte x, byte y, const __FlashStringHelper * format, ...)
+{
+  va_list args;
+  va_start (args, format);
+  vsnprintf_P(buf1, 16, (const char *)format, args);
+  display.setCursor(x,y * 10);
+  display.print(buf1);
+} 
+void init_display()
+{
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+    display.setTextColor(WHITE);
+    display.setTextSize(1);
+    display.clearDisplay();
+}
+
+void printBatt(byte x, byte y, int vcc)
+{
+}
+
+void clear()
+{
+  //long vcc = (unsigned int)readVcc() / 100;
+  display.clearDisplay();
+  //printAt(128-2*6 - 16,0, F("%i"), (int)vcc);
+}
+
+static const unsigned char PROGMEM battery_bmp0[] =
+{
+  B11111111,B11111000,
+  B10000000,B00001000,
+  B10000000,B00001110,
+  B10000000,B00001110,
+  B10000000,B00001110,
+  B10000000,B00001000,
+  B11111111,B11111000,
+};
+static const unsigned char PROGMEM battery_bmp1[] =
+{
+  B11111111,B11111000,
+  B11100000,B00001000,
+  B11100000,B00001110,
+  B11100000,B00001110,
+  B11100000,B00001110,
+  B11100000,B00001000,
+  B11111111,B11111000,
+};
+static const unsigned char PROGMEM battery_bmp2[] =
+{
+  B11111111,B11111000,
+  B11101100,B00001000,
+  B11101100,B00001110,
+  B11101100,B00001110,
+  B11101100,B00001110,
+  B11101100,B00001000,
+  B11111111,B11111000,
+};
+static const unsigned char PROGMEM battery_bmp3[] =
+{
+  B11111111,B11111000,
+  B11101101,B10001000,
+  B11101101,B10001110,
+  B11101101,B10001110,
+  B11101101,B10001110,
+  B11101101,B10001000,
+  B11111111,B11111000,
+};
+static const unsigned char PROGMEM battery_bmp4[] =
+{
+  B11111111,B11111000,
+  B11101101,B10111000,
+  B11101101,B10111110,
+  B11101101,B10111110,
+  B11101101,B10111110,
+  B11101101,B10111000,
+  B11111111,B11111000,
+};
+static const unsigned char PROGMEM battery_bmp5[] =
+{
+  B11111111,B11111000,
+  B11111110,B01111000,
+  B11111100,B11111110,
+  B10000000,B11111110,
+  B11111100,B11111110,
+  B11111110,B01111000,
+  B11111111,B11111000,
+};
+
+void show()
+{
+  long vcc = (unsigned int)readVcc();
+  register byte i = 0;
+  if(vcc > 2900) i++;
+  if(vcc > 3200) i++;
+  if(vcc > 3500) i++;
+  if(vcc > 3800) i++;
+  if(vcc > 4100) i++;
+
+  switch (i)
+  {
+    case 0: display.drawBitmap(128-15, 0, battery_bmp0, 15, 7, 1); break;
+    case 1: display.drawBitmap(128-15, 0, battery_bmp1, 15, 7, 1); break;
+    case 2: display.drawBitmap(128-15, 0, battery_bmp2, 15, 7, 1); break;
+    case 3: display.drawBitmap(128-15, 0, battery_bmp3, 15, 7, 1); break;
+    case 4: display.drawBitmap(128-15, 0, battery_bmp4, 15, 7, 1); break;
+    case 5: display.drawBitmap(128-15, 0, battery_bmp5, 15, 7, 1); break;
+  }
+  printAt(128-2*6 - 16,0, F("%i"), (int)(vcc / 100));
+
+  display.display();
+}
 
 // read double word from EEPROM, give starting address
 unsigned long EEPROM_readlong(int address) {
@@ -139,29 +261,17 @@ void setup()
   attachInterrupt(0, sensorA, RISING);
   attachInterrupt(1, sensorB, RISING);
 
-  // ADC for co2 pressure in the moderator
-  ADMUX = (1 << REFS0) | (1 << ADLAR);
-  ADCSRA = 0xAC;           // AD-converter on, interrupt enabled, prescaler = 16
-  ADCSRB = 0x40;           // AD channels MUX on, free running mode
-  bitWrite(ADCSRA, 6, 1);  // Start the conversion by setting bit 6 (=ADSC) in ADCSRA
-
   // setting sensors
   pressureSensor.begin();
-  tempSensor.begin();
   
   // setup display and display about info
-  lcd.init();
-  display_about();
-
-  delay(700);
+  init_display();
   
   // setting up measuring stuff
   noInterrupts();
   impulseA = impulseB = 0;
   timestampA = timestampB = 0;
   interrupts();
-
-  lcd.clear(0);
 }
 
 void sensorA()
@@ -178,13 +288,6 @@ void sensorB()
     timestampB = tmpB;
 }
 
-/*** Interrupt routine ADC ready ***/
-ISR(ADC_vect) {
-  byte aval = ADCH;
-  if (aval > max_aval)
-    max_aval = aval;
-}
-
 double read_ambient_pressure(double T)
 {
   double P;
@@ -198,17 +301,6 @@ double read_ambient_temperature()
   delay(pressureSensor.startTemperature());
   pressureSensor.getTemperature(T);
   return T;
-}
-int read_co2_temperature()
-{
-  tempSensor.requestTemperatures();
-  return tempSensor.getTempCByIndex(0);
-}
-int read_co2_pressure()
-{
-  int ma = max_aval;
-  max_aval = 0;
-  return ma;
 }
 
 void register_shot()
@@ -234,11 +326,9 @@ void register_shot()
     interrupts();
     
     T = read_ambient_temperature();
-    velocity_values[0].ambient_temperature = (int)T;
-    velocity_values[0].ambient_pressure = (int)read_ambient_pressure(T);
-    velocity_values[0].co2_temperature = read_co2_temperature();
-    velocity_values[0].co2_pressure = read_co2_pressure();
-    velocity_values[0].timestamp = millis();
+    //velocity_values[0].timestamp = millis();
+    ambient_temperature = (int)T;
+    ambient_pressure = (int)read_ambient_pressure(T);
 
     delay(500);
 
@@ -251,8 +341,8 @@ void register_shot()
 
 void display_about()
 {
-  static int last_display_pos = -1;
-  
+  static int last_display_pos = DT_UNKNOWN;
+  clear();
   if (buttonEx1.longPress())
   {
     Distance = EEPROM.read(DISTANCE_ADDR);
@@ -266,17 +356,16 @@ void display_about()
   }
     
   double T = read_ambient_temperature();
-  lcd.printAt(0, 0, F("TUBE Chrony"));
-  lcd.printAt(0, 1, F("c 2014 v1.0"));
-  lcd.printAt(0, 2, F("d = %d mm"), (int)(Distance + display_pos));
-  lcd.printAt(0, 3, F("Ta = %i C"), (int)T);
-  lcd.printAt(0, 4, F("Pa = %i mb"), (int)read_ambient_pressure(T));
-
+  printAt(0, 0, F("TUBE Chrony"));
+  printAt(0, 1, F("c 2017 v1.1"));
+  printAt(0, 2, F("d = %d mm"), (int)(Distance + display_pos));
+  printAt(0, 3, F("Ta = %i C"), (int)T);
+  printAt(0, 4, F("Pa = %i mb"), (int)read_ambient_pressure(T));
+  show();
+  
   if (last_display_pos == display_pos && !buttonEx1.pushed())
     return;
   last_display_pos = display_pos;
-
-  lcd.printAt(0, 5, F("Tc = %i C  "), read_co2_temperature());
 }
 
 void display_shot_string()
@@ -286,13 +375,14 @@ void display_shot_string()
 
   if (shot_count == 0)
   {
-    lcd.printAt(0, 0, F("Shot String"));
-    lcd.printAt(7 * 3, 2, F("WAITING"));
+    printAt(0, 0, F("Shot String"));
+    printAt(7 * 3, 2, F("WAITING"));
+    show();
   }
 
   if (shot_count == last_shot_count)
     return;
-  lcd.clear(0);
+  clear();
   last_shot_count = shot_count;
   
   if (display_pos < 0)
@@ -303,32 +393,32 @@ void display_shot_string()
   }
   j = display_pos * 5;
 
-  lcd.printAt(0, 0, F("(%3i) #: %3i"), j, shot_count);
+  printAt(0, 0, F("(%3i) #: %3i"), j, shot_count);
 
   // display shot string
   for (i = 0; i < 5; i++)
   {
     dtostrf(velocity_values[i + j].velocity, 3, 1, str);
-    lcd.printAt(0, 1 + i, F("%s %i %i"), str, 
-      velocity_values[i + j].co2_temperature, 
-      velocity_values[i + j].ambient_pressure);
+    printAt(0, 1 + i, F("%s %i %i"), str, 
+      ambient_temperature,
+      ambient_pressure);
   }
+  show();
 }
 
 void display_last_shot()
 {
-  char str[10]; 
-
   if (shot_count == 0)
   {
-    lcd.printAt(0, 0, F("Last Shot"));
-    lcd.printAt(7 * 3, 2, F("WAITING"));
+    printAt(0, 0, F("Last Shot"));
+    printAt(7 * 3, 2, F("WAITING"));
+    show();
   }
 
   if (shot_count == last_shot_count)
     return;
+  clear();
   
-  lcd.clear(0);
   last_shot_count = shot_count;
 
   if (display_pos < 0)
@@ -338,42 +428,30 @@ void display_last_shot()
     display_pos = shot_count - 1;
   }
 
-  lcd.printAt(0, 0, F("(%3i) #: %3i"), display_pos, shot_count);
+  printAt(0, 0, F("(%3i) #: %3i"), display_pos, shot_count);
 
-  dtostrf(velocity_values[display_pos].velocity, 3, 1, str);str[5] = '\0';
-  lcd.printAt(0,1, F("V= %smps"), str);
-  lcd.printAt(0,2, F("Ta= %i C"), velocity_values[display_pos].ambient_temperature);
-  lcd.printAt(0,3, F("Pa= %i mb"), velocity_values[display_pos].ambient_pressure);
-  lcd.printAt(0,4, F("Tc= %i C"), velocity_values[display_pos].co2_temperature);
-  lcd.printAt(0,5, F("Pc= %i mb"), velocity_values[display_pos].co2_pressure);
-}
-
-void put_pixel(int i, float mi, float ma, float v)
-{
-  int y = 4 * 8 - (int)((4 * 8) * ((v - mi) / (ma - mi)));
-  int p = y / 8;
-  int b = y % 8;
-  byte data = 1<<b;
-  lcd.setPos(i + 5, p + 1);
-  lcd.putSymbol(&data, 1);
+  dtostrf(velocity_values[display_pos].velocity, 3, 1, buf);buf[5] = '\0';
+  printAt(0,1, F("V= %smps"), buf);
+  printAt(0,2, F("Ta= %i C"), ambient_temperature);
+  printAt(0,3, F("Pa= %i mb"), ambient_pressure);
+  show();
 }
 
 void display_graph()
 {
   float mi = 1000, ma = 0;
-  int i;
-  char* s[] = {"V", "Pa", "Ta", "Pc", "Tc"};
-  //char smi[6]; sma[6];
+  int x, y, x1, y1, i;
   
-  if (shot_count == 0)
+  if (shot_count < 2)
   {
-    lcd.printAt(0, 0, F("Shot Graph"));
-    lcd.printAt(7 * 3, 2, F("WAITING"));
+    printAt(0, 0, F("Shot Graph"));
+    printAt(7 * 3, 2, F("WAITING"));
+    show();
   }
 
   if (shot_count == last_shot_count)
     return;
-  lcd.clear(0);
+  clear();
   last_shot_count = shot_count;
   if (display_pos < 0)
     display_pos = 0;  
@@ -381,38 +459,32 @@ void display_graph()
 
   for (i = 0; i < shot_count; i++)
   {
-    switch (display_pos)
-    {
-      case 0: mi = min(mi, velocity_values[i].velocity); ma = max(ma, velocity_values[i].velocity); break;
-      case 1: mi = min(mi, velocity_values[i].ambient_pressure); ma = max(ma, velocity_values[i].ambient_pressure); break;
-      case 2: mi = min(mi, velocity_values[i].ambient_temperature); ma = max(ma, velocity_values[i].ambient_temperature); break;
-      case 3: mi = min(mi, velocity_values[i].co2_pressure); ma = max(ma, velocity_values[i].co2_pressure); break;
-      case 4: mi = min(mi, velocity_values[i].co2_temperature); ma = max(ma, velocity_values[i].co2_temperature); break;
-    }
+    mi = min(mi, velocity_values[i].velocity); ma = max(ma, velocity_values[i].velocity);
   }
 
-  lcd.printAt(0, 0, F("%s %i %i-%i"), s[display_pos], shot_count, (int)mi, (int)ma);
+  printAt(0, 0, F("%i: %i-%i"), shot_count, (int)mi, (int)ma);
 
+  x = 0;
+  y = 0;
   for (i = 0; i < shot_count; i++)
   {
-    switch (display_pos)
-    {
-      case 0: put_pixel(shot_count - i, mi, ma, velocity_values[i].velocity); break;
-      case 1: put_pixel(shot_count - i, mi, ma, velocity_values[i].ambient_pressure); break;
-      case 2: put_pixel(shot_count - i, mi, ma, velocity_values[i].ambient_temperature); break;
-      case 3: put_pixel(shot_count - i, mi, ma, velocity_values[i].co2_pressure); break;
-      case 4: put_pixel(shot_count - i, mi, ma, velocity_values[i].co2_temperature); break;
-    }
+    x1 = (int)i * (128.0f / (float)shot_count);
+    y1 = (int)54.0f*(1.0f - (velocity_values[i].velocity - mi) / (ma - mi));
+    display.drawLine(128 - x, 10 + y, 128 - x1, 10 + y1, WHITE);
+    x = x1;
+    y = y1;
+    //put_pixel(shot_count - i, mi, ma, velocity_values[i].velocity);
   }
+  show();
 }
 
-void display_transfer()
+/*void display_transfer()
 {
-  char str[10];
-  lcd.printAt(0, 0, F("TRANSFER"));
-  lcd.printAt(0, 1, F("press btn 3"));
-  lcd.printAt(0, 2, F("to send"));
-
+  clear();
+  printAt(0, 0, F("TRANSFER"));
+  printAt(0, 1, F("press btn 3"));
+  printAt(0, 2, F("to send"));
+  show();
   if (buttonEx1.pushed())
   {
     SoftwareSerial sender(8, A0);
@@ -420,38 +492,32 @@ void display_transfer()
     
     sender.println(F("# TUBE Crony (c) 2014 v1.0"));
     sender.println(F("# Shot count ")); 
-    sender.println(F("# velocity; Pamb; Tamb; Pco2; Tco2; timestamp ")); 
+    sender.println(F("# velocity; timestamp ")); 
     sender.println(shot_count);
     for (int i = 0; i < shot_count; i++)
     {
       // send
-      dtostrf(velocity_values[i].velocity, 4, 2, str);
-      sender.print(str); sender.print(F("; "));
-      sender.print(velocity_values[i].ambient_pressure); sender.print(F("; "));
-      sender.print(velocity_values[i].ambient_temperature); sender.print(F("; "));
-      sender.print(velocity_values[i].co2_pressure); sender.print(F("; "));
-      sender.print(velocity_values[i].co2_temperature); sender.print(F("; "));
-      sender.print(velocity_values[i].timestamp); sender.println();
-      lcd.printAt(0, 4, F("Out: %i/%i"), i, shot_count);
+      dtostrf(velocity_values[i].velocity, 4, 2, buf);
+      sender.print(buf); sender.print(F("; "));
+      //sender.print(velocity_values[i].timestamp); 
+      sender.println();
+      printAt(0, 4, F("Out: %i/%i"), i, shot_count);
+      show();
     }
   }
-}
+  show();
+} */
 
 void display_info()
 {
-  static DISPLAY_TYPE last_display_type = DT_ABOUT;
+  static DISPLAY_TYPE last_display_type = DT_UNKNOWN;
 #ifdef DEBUG
-  char str[10];  
   int a, b;
   a = digitalRead(pinA);
   b = digitalRead(pinB);
 
-  lcd.setPos(42, 4);
-  sprintf(str, "%i, %i ", a, b);
-  lcd.putStr(str);
-  lcd.setPos(42, 5);
-  sprintf(str, "%i, %i  ", impulseA, impulseB);
-  lcd.putStr(str);
+  printAt(42, 4, "%i, %i ", a, b);
+  printAt(42, 5, "%i, %i  ", impulseA, impulseB);
 #endif
 
   if (last_display_type != display_type)
@@ -459,13 +525,18 @@ void display_info()
     last_display_type = display_type;
     display_pos = 0;
     last_shot_count = 0;
-    lcd.clear(0);
+    clear();
   }
 
   switch (display_type)
   {
   case DT_ABOUT:
     display_about();
+    return;
+  case DT_ABOUT_INIT:
+    display_about();
+    delay(5000);
+    display_type = DT_LAST_SHOT;
     return;
   case DT_SHOT_STRING:
     display_shot_string();
@@ -476,9 +547,9 @@ void display_info()
   case DT_SHOT_GRAPH:
     display_graph();
     return;
-  case DT_TRANSFER:
-    display_transfer();
-    return;
+//  case DT_TRANSFER:
+//    display_transfer();
+//    return;
   }
 }
 
@@ -512,19 +583,13 @@ void handle_buttons()
     for (int i = 0; i < SHOT_STRING_LENGTH; i++)
     {
       velocity_values[i].velocity = 0;
-      velocity_values[i].timestamp = 0;
-      velocity_values[i].ambient_pressure = 0;
-      velocity_values[i].co2_temperature = 0;
-      velocity_values[i].co2_pressure = 0;
-      velocity_values[i].co2_temperature = 0;
+      //velocity_values[i].timestamp = 0;
     }
     shot_count = 0;
     last_shot_count = 0;
-    display_about();
-    delay(700);
-    display_type = DT_LAST_SHOT;
     display_pos = 0;
-    lcd.clear(0);
+    display_type = DT_ABOUT_INIT;
+    clear();
   }
 }
 
