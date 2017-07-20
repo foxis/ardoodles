@@ -203,6 +203,13 @@ void setup(void)
   pinMode(MOTOR_B_PIN, OUTPUT);
   pinMode(COOLER_A_PIN, OUTPUT);
   pinMode(COOLER_B_PIN, OUTPUT);
+
+  //pinMode(A0, INPUT_PULLUP);
+  //pinMode(A1, INPUT_PULLUP);
+  //pinMode(A2, INPUT_PULLUP);
+  //pinMode(A3, INPUT_PULLUP);
+  //pinMode(A6, INPUT_PULLUP);
+  //pinMode(A7, INPUT_PULLUP);
   
   digitalWrite(COOLER_A_PIN, LOW);
   digitalWrite(COOLER_B_PIN, LOW);
@@ -246,20 +253,15 @@ float read_temperature(byte pin)
 #define SERIES_RESISTANCE   10000.0
 #define BETA_COEFFICIENT    3950.0
 #define NOMINAL_TEMPERATURE 25.0
-#define ADC_SIZE_8_BIT              8
-#define ADC_SIZE_10_BIT             10
-#define ADC_SIZE_12_BIT             12
-#define ADC_SIZE_16_BIT             16
-#define ADC_SIZE                    ADC_SIZE_10_BIT
   for (uint8_t i = 0; i < 3; i++) {
       average += analogRead(_analogPin);
-      delay(5);
+      delay(1);
   }
 
   average /= 3.0f;
-
+  
   // convert the value to resistance
-  average = SERIES_RESISTANCE * ((ADC_SIZE * ADC_SIZE - 1) / average - 1.0);
+  average = SERIES_RESISTANCE / (1023 / average - 1.0f);
 
   // Steinhart–Hart equation, based on https://learn.adafruit.com/thermistor/using-a-thermistor
   float steinhart = (log(average / NOMINAL_RESISTANCE)) / BETA_COEFFICIENT;
@@ -279,8 +281,8 @@ void loop(void)
   ESC.poll();
   ENT.poll();
   
-  temp[temperature_read_pos++] = read_temperature(temperature_read_pos);
-  if (temperature_read_pos >= SENSORS_NUM)
+  temp[temperature_read_pos] = read_temperature(temperature_read_pos);
+  if (++temperature_read_pos >= SENSORS_NUM)
     temperature_read_pos = 0;
   //temp[HOT_SIDE_B] = read_temperature(A1);
   //temp[COLD_SIDE_A] = read_temperature(A2);
