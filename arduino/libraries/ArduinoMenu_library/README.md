@@ -5,6 +5,7 @@
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Build Status](https://travis-ci.org/neu-rah/ArduinoMenu.svg?branch=dev)](https://travis-ci.org/neu-rah/ArduinoMenu)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/ruihfazevedo)
+[![Join Gitter](https://img.shields.io/badge/GITTER-join%20chat-green.svg)](https://gitter.im/ArduinoMenu/Lobby)
 
 ## Purpose
 Full automated or user code driven navigation system.
@@ -120,7 +121,7 @@ https://bitbucket.org/fmalpartida/new-liquidcrystal/wiki/Home
 Adafruit's GFX devices
 https://github.com/adafruit/Adafruit-GFX-Library
 
-UTFT devices (not yet implemented on v3)
+UTFT devices
 http://www.rinkydinkelectronics.com/library.php?id=51
 
 U8glib devices
