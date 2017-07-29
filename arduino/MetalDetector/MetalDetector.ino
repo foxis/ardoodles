@@ -4,8 +4,8 @@
 
 U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);  // Adafruit ESP8266/32u4/ARM Boards + FeatherWing OLED
 
-#define NUM 110
-#define SPAN 32
+#define NUM 32
+#define SPAN 128
 long readings[NUM] = {0,};
 
 
@@ -13,7 +13,7 @@ void setup(void) {
   u8g2.begin();
   FreqCount.begin(500);  
   u8g2.clearBuffer();
-  //Serial.begin(115200);
+  Serial.begin(115200);
 
   while (!FreqCount.available()) ;
   long f = FreqCount.read();
@@ -29,7 +29,7 @@ void loop() {
       readings[i] = readings[i + 1];
     readings[NUM - 1] = FreqCount.read();
 
-    for (byte i = 0; i < 4; i ++)
+    for (byte i = 0; i < NUM; i ++)
     {
       long reading = readings[NUM - i - 1];
       if (reading < mi)
@@ -38,7 +38,7 @@ void loop() {
         ma = reading;
     }
 
-    //Serial.print(readings[NUM - 1]);
+    Serial.println(readings[NUM - 1]);
     //Serial.print(' ');
     //Serial.print(mi);
     //Serial.print(' ');
@@ -47,10 +47,10 @@ void loop() {
   
       long mid = (ma + mi) / 2;
     //Serial.println(mid);
-    if (ma - mi < SPAN)
+    if (ma - mi < SPAN / 2)
     {
-      mi = mid - SPAN / 2;
-      ma = mid + SPAN / 2;
+      mi = mid - SPAN / 4;
+      ma = mid + SPAN / 4;
     }
   
     scale = SPAN / (float)(ma - mi);
@@ -59,8 +59,8 @@ void loop() {
     u8g2.clearBuffer();
   
     for (byte i = 0; i < NUM - 1; i++)
-      u8g2.drawLine(i, min(SPAN-1, max(0, 32 - (readings[i] - mi) * scale)), 
-          i + 1, min(SPAN-1, max(0, 32 - (readings[i + 1] - mi) * scale)));
+      u8g2.drawLine(min(SPAN-1, max(0, SPAN - (readings[i] - mi) * scale)), i,
+          min(SPAN-1, max(0, SPAN - (readings[i + 1] - mi) * scale)), i + 1);
     
     u8g2.sendBuffer();
   }
