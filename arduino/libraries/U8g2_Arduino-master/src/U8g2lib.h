@@ -189,6 +189,8 @@ class U8G2 : public Print
       { u8g2_SetBitmapMode(&u8g2, is_transparent); }
     void drawBitmap(u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t cnt, u8g2_uint_t h, const uint8_t *bitmap)
       { u8g2_DrawBitmap(&u8g2, x, y, cnt, h, bitmap); }
+    void drawBitmapP(u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t cnt, u8g2_uint_t h, const uint8_t *bitmap)
+      { u8g2_DrawBitmapP(&u8g2, x, y, cnt, h, bitmap); }
     void drawXBM(u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w, u8g2_uint_t h, const uint8_t *bitmap)
       { u8g2_DrawXBM(&u8g2, x, y, w, h, bitmap); }
     void drawXBMP(u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w, u8g2_uint_t h, const uint8_t *bitmap)

@@ -80,6 +80,39 @@ void u8g2_DrawHorizontalBitmap(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_
   }
 }
 
+void u8g2_DrawHorizontalBitmapP(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t len, const uint8_t *b)
+{
+  uint8_t mask;
+  uint8_t color = u8g2->draw_color;
+  uint8_t ncolor = (color == 0 ? 1 : 0);
+#ifdef U8G2_WITH_INTERSECTION
+  if ( u8g2_IsIntersection(u8g2, x, y, x+len, y+1) == 0 ) 
+    return;
+#endif /* U8G2_WITH_INTERSECTION */
+  
+  mask = 128;
+  while(len > 0)
+  {
+    if( u8x8_pgm_read(b) & mask ) {
+      u8g2->draw_color = color;
+      u8g2_DrawHVLine(u8g2, x, y, 1, 0);
+    } else if( u8g2->bitmap_transparency == 0 ) {
+      u8g2->draw_color = ncolor;
+      u8g2_DrawHVLine(u8g2, x, y, 1, 0);
+    }
+   
+    x++;
+    mask >>= 1;
+    if ( mask == 0 )
+    {
+      mask = 128;
+      b++;
+    }
+    len--;
+  }
+  u8g2->draw_color = color;
+}
+
 
 /* u8glib compatible bitmap draw function */
 void u8g2_DrawBitmap(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t cnt, u8g2_uint_t h, const uint8_t *bitmap)
@@ -96,6 +129,27 @@ void u8g2_DrawBitmap(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t cnt
   {
     u8g2_DrawHorizontalBitmap(u8g2, x, y, w, bitmap);
     bitmap += cnt;
+    y++;
+    h--;
+  }
+}
+
+void u8g2_DrawBitmapP(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w, u8g2_uint_t h, const uint8_t *bitmap)
+{
+  u8g2_uint_t blen;
+  blen = w;
+  blen += 7;
+  blen >>= 3;
+  
+#ifdef U8G2_WITH_INTERSECTION
+  if ( u8g2_IsIntersection(u8g2, x, y, x+w, y+h) == 0 ) 
+    return;
+#endif /* U8G2_WITH_INTERSECTION */
+  
+  while( h > 0 )
+  {
+    u8g2_DrawHorizontalBitmapP(u8g2, x, y, w, bitmap);
+    bitmap += blen;
     y++;
     h--;
   }
